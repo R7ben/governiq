@@ -44,7 +44,7 @@ export function PipelineIndicator({ isActive, isComplete }: Props) {
   if (!isActive && !isComplete) return null;
 
   return (
-    <div className="flex items-center gap-1 mb-4 p-3 rounded-lg bg-zinc-900/80 border border-zinc-800">
+    <div className="flex items-center gap-1 mb-4 p-4 rounded-lg bg-zinc-900/80 border border-zinc-800">
       {steps.map((step, i) => {
         const Icon = step.icon;
         const isStepActive = i <= activeStep;
@@ -60,11 +60,11 @@ export function PipelineIndicator({ isActive, isComplete }: Props) {
                 initial={{ scale: 0.8 }}
                 animate={{ scale: isStepActive ? 1 : 0.8 }}
                 transition={{ duration: 0.2 }}
-                className={`p-1.5 rounded ${
+                className={`p-2 rounded ${
                   isStepActive ? "bg-emerald-500/20" : "bg-zinc-800"
                 }`}
               >
-                <Icon className={`h-3.5 w-3.5 ${
+                <Icon className={`h-4 w-4 ${
                   isStepActive ? "text-emerald-400" : "text-zinc-600"
                 }`} />
               </motion.div>

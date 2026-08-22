@@ -1,5 +1,5 @@
 import { streamText } from "ai";
-import { google } from "@ai-sdk/google";
+import { groq } from "@ai-sdk/groq";
 
 export async function POST(req: Request) {
   const { companyName, code, sector, score, trend, events, constructs } = await req.json();
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     : "";
 
   const result = streamText({
-    model: google("gemini-2.5-flash-preview-05-20"),
+    model: groq("openai/gpt-oss-120b"),
     system: `You are a governance analyst specializing in Bursa Malaysia listed companies, using the validated 7-construct Investor Confidence Score (ICS) model derived from PLS-SEM research (N=100 Malaysian PLCs, 7 constructs, 35 indicators, all VIF < 5.0).
 
 The 7 constructs are: Board Leadership (BL), Strategic Vision (SV), Ethical Integrity (EI), Risk Management (RM), Remuneration Transparency (RT), Stakeholder Engagement (SE), and Sustainability Orientation (SO).

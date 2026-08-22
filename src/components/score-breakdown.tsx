@@ -38,12 +38,12 @@ export function ScoreBreakdown({ constructs }: Props) {
   const keys = Object.keys(constructs) as (keyof ConstructScores)[];
 
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-5">
+    <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-5 shadow-sm shadow-black/10 transition-shadow duration-200 hover:shadow-md hover:shadow-black/20">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-zinc-200">
           ICS Score Breakdown — 7-Construct Model
         </h3>
-        <div className="flex items-center gap-3 text-xs text-zinc-500">
+        <div className="flex items-center gap-3 text-xs text-zinc-500 tracking-wide">
           <span className="inline-flex items-center gap-1">
             <span className="w-3 h-0.5 bg-zinc-400 inline-block" />
             N=100 avg
@@ -83,7 +83,7 @@ export function ScoreBreakdown({ constructs }: Props) {
                   title={`Market avg: ${avg}`}
                 />
               </div>
-              <div className={`w-8 text-xs font-bold text-right ${colors.text}`}>
+              <div className={`w-8 text-xs font-bold text-right tabular-nums ${colors.text}`}>
                 {score}
               </div>
             </motion.div>

@@ -60,7 +60,12 @@ function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string
     };
     requestAnimationFrame(animate);
   }, [value]);
-  return <>{Number.isInteger(value) ? Math.round(display) : display.toFixed(1)}{suffix}</>;
+  return (
+    <span className="tabular-nums">
+      {Number.isInteger(value) ? Math.round(display) : display.toFixed(1)}
+      {suffix}
+    </span>
+  );
 }
 
 export default function DashboardPage() {
@@ -98,12 +103,12 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3">
             <Shield className="h-8 w-8 text-emerald-400" />
             <div>
-              <h1 className="text-xl font-bold text-zinc-50">GovernIQ</h1>
-              <p className="text-xs text-zinc-400">ESG & Governance Intelligence for Bursa Malaysia</p>
+              <h1 className="text-2xl font-bold text-zinc-50">GovernIQ</h1>
+              <p className="text-xs text-zinc-400 tracking-wide">ESG & Governance Intelligence for Bursa Malaysia</p>
             </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs">
+            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs tracking-wide">
               PLC Tier · Investor Confidence Engine
             </Badge>
           </div>
@@ -113,33 +118,33 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
         {/* Stat Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800">
+            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Building2 className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500">Coverage</span>
+                  <span className="text-xs text-zinc-500 tracking-wide">Coverage</span>
                 </div>
                 <div className="text-2xl font-bold text-zinc-100">
                   <AnimatedNumber value={companies.length} />
                 </div>
-                <p className="text-xs text-zinc-500 mt-1">Bursa PLCs</p>
+                <p className="text-xs text-zinc-500 mt-1 tracking-wide">Bursa PLCs</p>
               </CardContent>
             </Card>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.05 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800">
+            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <BarChart3 className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500">Avg ICS</span>
+                  <span className="text-xs text-zinc-500 tracking-wide">Avg ICS</span>
                 </div>
                 <div className="text-2xl font-bold text-zinc-100">
                   <AnimatedNumber value={avgScore} />
                 </div>
-                <p className={`text-xs mt-1 ${avgTrend >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                <p className={`text-xs mt-1 tracking-wide tabular-nums ${avgTrend >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {avgTrend > 0 ? "+" : ""}{avgTrend} avg trend
                 </p>
               </CardContent>
@@ -147,29 +152,29 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800">
+            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertTriangle className="h-4 w-4 text-red-400" />
-                  <span className="text-xs text-zinc-500">Open Alerts</span>
+                  <span className="text-xs text-zinc-500 tracking-wide">Open Alerts</span>
                 </div>
                 <div className="text-2xl font-bold text-red-400">
                   <AnimatedNumber value={highRiskCount} />
                 </div>
-                <p className="text-xs text-zinc-500 mt-1">High risk</p>
+                <p className="text-xs text-zinc-500 mt-1 tracking-wide">High risk</p>
               </CardContent>
             </Card>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800">
+            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Clock className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500">Last Refresh</span>
+                  <span className="text-xs text-zinc-500 tracking-wide">Last Refresh</span>
                 </div>
-                <div className="text-2xl font-bold text-zinc-100">2h</div>
-                <p className="text-xs text-zinc-500 mt-1">ago</p>
+                <div className="text-2xl font-bold text-zinc-100 tabular-nums">2h</div>
+                <p className="text-xs text-zinc-500 mt-1 tracking-wide">ago</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -191,7 +196,7 @@ export default function DashboardPage() {
               <button
                 key={level}
                 onClick={() => setRiskFilter(riskFilter === level ? null : level)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`min-h-[44px] sm:min-h-0 inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 ${
                   riskFilter === level
                     ? riskColors[level]
                     : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:bg-zinc-800"
@@ -245,18 +250,18 @@ export default function DashboardPage() {
                     <td className="px-4 py-4 text-sm text-zinc-400 font-mono hidden sm:table-cell">{company.code}</td>
                     <td className="px-4 py-4 text-sm text-zinc-400 hidden md:table-cell">{company.sector}</td>
                     <td className="px-4 py-4 text-center">
-                      <span className={`text-sm font-bold ${scoreColors[getScoreRating(company.score)]}`}>
+                      <span className={`text-sm font-bold tabular-nums ${scoreColors[getScoreRating(company.score)]}`}>
                         {company.score}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-center">
-                      <span className={`inline-flex items-center gap-1 text-sm ${
+                      <span className={`inline-flex items-center gap-1 text-sm tabular-nums ${
                         company.trend >= 0 ? "text-emerald-400" : "text-red-400"
                       }`}>
                         {company.trend >= 0 ? (
-                          <TrendingUp className="h-3.5 w-3.5" />
+                          <TrendingUp className="h-4 w-4" />
                         ) : (
-                          <TrendingDown className="h-3.5 w-3.5" />
+                          <TrendingDown className="h-4 w-4" />
                         )}
                         {company.trend > 0 ? "+" : ""}{company.trend}
                       </span>
@@ -284,10 +289,10 @@ export default function DashboardPage() {
                     <td className="px-4 py-4 text-right">
                       <Link
                         href={`/company/${company.code}`}
-                        className="inline-flex items-center gap-1 text-sm text-zinc-500 group-hover:text-emerald-400 transition-colors"
+                        className="inline-flex items-center gap-1 text-sm text-zinc-500 group-hover:text-emerald-400 transition-colors rounded-sm px-1 -mx-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                       >
                         View
-                        <ArrowRight className="h-3.5 w-3.5" />
+                        <ArrowRight className="h-4 w-4" />
                       </Link>
                     </td>
                   </motion.tr>
@@ -299,9 +304,9 @@ export default function DashboardPage() {
           {/* Empty state */}
           {filtered.length === 0 && (
             <div className="px-4 py-16 text-center">
-              <SearchX className="h-12 w-12 text-zinc-700 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-zinc-300 mb-2">No companies match your filters</h3>
-              <p className="text-sm text-zinc-500 mb-4">Try adjusting your search term or risk-level filter.</p>
+              <SearchX className="h-6 w-6 text-zinc-700 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-zinc-300 mb-2">No companies match these filters</h3>
+              <p className="text-sm text-zinc-500 mb-4">Try broadening your search or clearing the risk filter below.</p>
               <Button
                 variant="outline"
                 size="sm"
@@ -316,7 +321,7 @@ export default function DashboardPage() {
 
         {/* Validation Badge Footer */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-zinc-600">
+          <p className="text-xs text-zinc-600 tracking-wide">
             Scoring model validated via PLS-SEM structural analysis · N=100 Malaysian PLCs · VIF &lt; 5.0
           </p>
         </div>

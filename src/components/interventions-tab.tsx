@@ -50,7 +50,7 @@ export function InterventionsTab({ company }: Props) {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-6">
         {company.interventions.map((intervention, i) => (
           <motion.div
             key={i}
@@ -58,8 +58,8 @@ export function InterventionsTab({ company }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: i * 0.1 }}
           >
-            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-colors">
-              <CardHeader className="pb-3">
+            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
+              <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <Badge className={`${priorityColors[intervention.priority]} text-xs`}>
@@ -69,8 +69,8 @@ export function InterventionsTab({ company }: Props) {
                       {intervention.title}
                     </h4>
                   </div>
-                  <div className="flex items-center gap-1 text-emerald-400 text-xs font-medium">
-                    <ArrowUpRight className="h-3 w-3" />
+                  <div className="flex items-center gap-1 text-emerald-400 text-xs font-medium tabular-nums">
+                    <ArrowUpRight className="h-4 w-4" />
                     {intervention.impact}
                   </div>
                 </div>
@@ -91,7 +91,7 @@ export function InterventionsTab({ company }: Props) {
                   onClick={() => handleGenerateMemo(intervention)}
                   className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
                 >
-                  <FileText className="h-3.5 w-3.5 mr-1.5" />
+                  <FileText className="h-4 w-4 mr-1.5" />
                   Generate IR Memo
                 </Button>
               </CardContent>
@@ -100,9 +100,9 @@ export function InterventionsTab({ company }: Props) {
         ))}
       </div>
 
-      <div className="mt-4 p-3 rounded-lg bg-zinc-900/30 border border-zinc-800/50">
-        <div className="flex items-center gap-2 text-xs text-zinc-500">
-          <Zap className="h-3.5 w-3.5" />
+      <div className="mt-4 p-4 rounded-lg bg-zinc-900/30 border border-zinc-800/50">
+        <div className="flex items-center gap-2 text-xs text-zinc-500 tracking-wide">
+          <Zap className="h-4 w-4" />
           Interventions ranked by estimated ICS recovery impact
         </div>
       </div>

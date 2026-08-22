@@ -1,11 +1,11 @@
 import { streamText } from "ai";
-import { google } from "@ai-sdk/google";
+import { groq } from "@ai-sdk/groq";
 
 export async function POST(req: Request) {
   const { companyName, code, intervention, score, trend } = await req.json();
 
   const result = streamText({
-    model: google("gemini-2.5-flash-preview-05-20"),
+    model: groq("openai/gpt-oss-120b"),
     system: `You are a senior investor relations consultant drafting board memos for Bursa Malaysia listed companies. Write in formal but clear language suitable for board-level communication. Be specific about timelines, responsibilities, and expected outcomes.`,
     prompt: `Draft a board memo for ${companyName} (${code}) regarding the following governance intervention:
 

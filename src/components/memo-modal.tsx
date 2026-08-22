@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useCompletion } from "@ai-sdk/react";
 import { motion } from "framer-motion";
-import { FileText, Loader2, Copy, Check } from "lucide-react";
+import { FileText, Loader2, Copy, Check, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Company, Intervention } from "@/types/company";
+import { MarkdownContent } from "@/components/markdown-content";
 
 interface Props {
   open: boolean;
@@ -20,6 +21,7 @@ export function MemoModal({ open, onOpenChange, company, intervention }: Props) 
 
   const { completion, isLoading, complete } = useCompletion({
     api: "/api/memo",
+    streamProtocol: "text",
   });
 
   useEffect(() => {
@@ -63,21 +65,38 @@ export function MemoModal({ open, onOpenChange, company, intervention }: Props) 
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap font-mono">
-                {completion}
-              </div>
+              <MarkdownContent content={completion} />
+              {isLoading && (
+                <motion.span
+                  className="inline-block w-[2px] h-[1em] align-middle bg-emerald-400 ml-0.5"
+                  animate={{ opacity: [1, 1, 0, 0] }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear", times: [0, 0.5, 0.5, 1] }}
+                />
+              )}
             </motion.div>
           ) : (
             <div className="flex items-center justify-center py-12 text-zinc-500">
-              <Loader2 className="h-5 w-5 animate-spin mr-2" />
-              Drafting board memo...
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              Drafting governance memo...
             </div>
           )}
         </div>
 
         <div className="flex items-center justify-between mt-4">
-          <div className="text-xs text-zinc-500">
-            {isLoading ? "Generating..." : "Generation complete"}
+          <div className="flex items-center gap-1.5 text-xs text-zinc-500 tracking-wide">
+            {isLoading ? (
+              "Drafting in progress..."
+            ) : (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="inline-flex items-center gap-1 text-emerald-400"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                Memo ready
+              </motion.span>
+            )}
           </div>
           <Button
             size="sm"
@@ -88,12 +107,12 @@ export function MemoModal({ open, onOpenChange, company, intervention }: Props) 
           >
             {copied ? (
               <>
-                <Check className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+                <Check className="h-4 w-4 mr-1.5 text-emerald-400" />
                 Copied
               </>
             ) : (
               <>
-                <Copy className="h-3.5 w-3.5 mr-1.5" />
+                <Copy className="h-4 w-4 mr-1.5" />
                 Copy Memo
               </>
             )}

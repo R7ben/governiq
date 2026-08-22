@@ -30,8 +30,13 @@ export default function CompanyDetailPage() {
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-zinc-100 mb-2">Company Not Found</h1>
-          <p className="text-zinc-400 mb-4">No company with code &quot;{code}&quot; exists.</p>
-          <Link href="/" className="text-emerald-400 hover:underline">
+          <p className="text-zinc-400 mb-4">
+            We couldn&apos;t find a company with code &quot;{code}&quot; — it may have been delisted or the code mistyped.
+          </p>
+          <Link
+            href="/"
+            className="text-emerald-400 hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+          >
             Back to Dashboard
           </Link>
         </div>
@@ -47,13 +52,13 @@ export default function CompanyDetailPage() {
           <div className="flex items-center gap-3">
             <Shield className="h-8 w-8 text-emerald-400" />
             <div>
-              <h1 className="text-xl font-bold text-zinc-50">GovernIQ</h1>
-              <p className="text-xs text-zinc-400">ESG & Governance Intelligence for Bursa Malaysia</p>
+              <h1 className="text-2xl font-bold text-zinc-50">GovernIQ</h1>
+              <p className="text-xs text-zinc-400 tracking-wide">ESG & Governance Intelligence for Bursa Malaysia</p>
             </div>
           </div>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-100 transition-colors rounded-sm px-1 -mx-1 py-1 min-h-[44px] sm:min-h-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
@@ -77,14 +82,14 @@ export default function CompanyDetailPage() {
                   {company.riskLevel} risk
                 </Badge>
               </div>
-              <p className="text-zinc-400">
+              <p className="text-sm text-zinc-400">
                 {company.sector} &middot; Stock Code: {company.code}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-zinc-500 mb-1">Investor Confidence Score</p>
-              <div className="text-4xl font-bold text-zinc-100">{company.score}</div>
-              <div className={`inline-flex items-center gap-1 text-sm ${
+              <p className="text-xs text-zinc-500 mb-1 tracking-wide">Investor Confidence Score</p>
+              <div className="text-4xl font-bold text-zinc-100 tabular-nums">{company.score}</div>
+              <div className={`inline-flex items-center gap-1 text-sm tabular-nums ${
                 company.trend >= 0 ? "text-emerald-400" : "text-red-400"
               }`}>
                 {company.trend >= 0 ? (
@@ -94,7 +99,7 @@ export default function CompanyDetailPage() {
                 )}
                 {company.trend > 0 ? "+" : ""}{company.trend} pts (30d)
               </div>
-              <p className="text-xs text-zinc-600 mt-1">Simulated trajectory</p>
+              <p className="text-xs text-zinc-600 mt-1 tracking-wide">Simulated trajectory</p>
             </div>
           </div>
         </motion.div>
@@ -131,7 +136,7 @@ export default function CompanyDetailPage() {
                   className="mb-6 relative"
                 >
                   <div className="absolute -left-[31px] top-1 w-3 h-3 rounded-full bg-zinc-800 border-2 border-zinc-600" />
-                  <p className="text-xs text-zinc-500 mb-1">
+                  <p className="text-xs text-zinc-500 mb-1 tracking-wide tabular-nums">
                     {new Date(event.date).toLocaleDateString("en-MY", {
                       day: "numeric",
                       month: "short",

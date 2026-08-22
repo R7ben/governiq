@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "GovernIQ — Governance Intelligence",
+  title: "GovernIQ — ESG & Governance Intelligence",
   description: "Detect early signs of governance decline in Bursa Malaysia listed companies",
 };
 

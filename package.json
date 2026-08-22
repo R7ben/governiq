@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.49",
+    "@ai-sdk/groq": "^4.0.29",
     "@ai-sdk/react": "^4.0.79",
     "ai": "^7.0.76",
     "class-variance-authority": "^0.7.1",
@@ -19,16 +20,20 @@
     "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
+    "react-markdown": "^10.1.0",
     "recharts": "^3.10.1",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
+    "papaparse": "^5.6.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
