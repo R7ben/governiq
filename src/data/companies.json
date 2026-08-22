@@ -1,0 +1,338 @@
+[
+  {
+    "code": "1155",
+    "name": "Maybank",
+    "sector": "Financial Services",
+    "score": 82,
+    "trend": -3.2,
+    "riskLevel": "low",
+    "constructs": {
+      "bl_score": 88,
+      "sv_score": 85,
+      "ei_score": 82,
+      "rm_score": 80,
+      "rt_score": 72,
+      "se_score": 84,
+      "so_score": 83
+    },
+    "events": [
+      { "date": "2026-08-10", "title": "Board Independence Review", "description": "Annual review confirmed 7 of 11 directors are independent. No changes to key committees." },
+      { "date": "2026-07-22", "title": "ESG Report Published", "description": "Comprehensive ESG report released with improved climate risk disclosures." },
+      { "date": "2026-06-15", "title": "AGM Voting Results", "description": "All resolutions passed with >85% approval. Minor dissent on director remuneration." },
+      { "date": "2026-05-03", "title": "Related-Party Transaction Disclosed", "description": "RM 45M transaction with subsidiary fully disclosed per Listing Requirements." }
+    ],
+    "interventions": [
+      { "priority": "medium", "title": "Enhance Remuneration Disclosure", "explanation": "Address 15% dissent on director pay by publishing detailed peer-benchmarking data in next circular.", "impact": "+1.5 pts", "construct": "RT" },
+      { "priority": "low", "title": "Strengthen Climate Governance", "explanation": "Appoint a board-level climate committee to meet TCFD expectations from institutional investors.", "impact": "+1.0 pts", "construct": "SO" },
+      { "priority": "low", "title": "Expand Shareholder Engagement", "explanation": "Host quarterly virtual investor briefings to supplement AGM engagement.", "impact": "+0.8 pts", "construct": "SE" }
+    ]
+  },
+  {
+    "code": "1295",
+    "name": "Public Bank",
+    "sector": "Financial Services",
+    "score": 78,
+    "trend": -5.1,
+    "riskLevel": "medium",
+    "constructs": {
+      "bl_score": 62,
+      "sv_score": 80,
+      "ei_score": 85,
+      "rm_score": 82,
+      "rt_score": 78,
+      "se_score": 68,
+      "so_score": 91
+    },
+    "events": [
+      { "date": "2026-08-05", "title": "CEO Succession Concern", "description": "Founder-CEO approaching 5th decade. No public succession plan disclosed." },
+      { "date": "2026-07-18", "title": "Board Tenure Alert", "description": "3 independent directors exceeded 12-year tenure. Investors flagged entrenchment risk." },
+      { "date": "2026-06-28", "title": "Minority Shareholder Complaint", "description": "MSWG raised concerns about lack of board diversity and refreshment." },
+      { "date": "2026-05-20", "title": "Annual Report Released", "description": "Governance section largely unchanged from prior year. Limited forward-looking commitments." }
+    ],
+    "interventions": [
+      { "priority": "high", "title": "Publish Succession Plan", "explanation": "Immediate disclosure of CEO succession roadmap to address investor anxiety about key-person dependency.", "impact": "+3.2 pts", "construct": "BL" },
+      { "priority": "high", "title": "Board Refreshment Program", "explanation": "Replace 2 long-tenured directors with candidates having digital/ESG expertise within 6 months.", "impact": "+2.8 pts", "construct": "BL" },
+      { "priority": "medium", "title": "Adopt Board Diversity Policy", "explanation": "Set measurable targets for gender and skill-based diversity; disclose annually.", "impact": "+1.5 pts", "construct": "SE" }
+    ]
+  },
+  {
+    "code": "1023",
+    "name": "CIMB Group",
+    "sector": "Financial Services",
+    "score": 65,
+    "trend": -8.4,
+    "riskLevel": "high",
+    "constructs": {
+      "bl_score": 58,
+      "sv_score": 70,
+      "ei_score": 55,
+      "rm_score": 62,
+      "rt_score": 72,
+      "se_score": 68,
+      "so_score": 70
+    },
+    "events": [
+      { "date": "2026-08-12", "title": "Regulatory Investigation", "description": "Bank Negara opened inquiry into AML compliance gaps in cross-border unit." },
+      { "date": "2026-07-30", "title": "CFO Unexpected Departure", "description": "CFO resigned citing personal reasons. No immediate successor named." },
+      { "date": "2026-07-05", "title": "Audit Committee Concerns", "description": "External auditor issued emphasis of matter on loan provisioning methodology." },
+      { "date": "2026-06-10", "title": "Shareholder Activism", "description": "Two institutional investors publicly called for governance overhaul." }
+    ],
+    "interventions": [
+      { "priority": "high", "title": "Appoint Interim CFO Immediately", "explanation": "Name an acting CFO within 2 weeks to restore market confidence in financial oversight.", "impact": "+3.5 pts", "construct": "BL" },
+      { "priority": "high", "title": "Engage Regulator Proactively", "explanation": "Publish voluntary compliance enhancement plan before BNM concludes investigation.", "impact": "+2.9 pts", "construct": "EI" },
+      { "priority": "medium", "title": "Independent Governance Review", "explanation": "Commission external governance audit and commit to implementing recommendations publicly.", "impact": "+2.1 pts", "construct": "RM" }
+    ]
+  },
+  {
+    "code": "5347",
+    "name": "Tenaga Nasional",
+    "sector": "Utilities",
+    "score": 74,
+    "trend": -4.7,
+    "riskLevel": "medium",
+    "constructs": {
+      "bl_score": 64,
+      "sv_score": 78,
+      "ei_score": 72,
+      "rm_score": 76,
+      "rt_score": 80,
+      "se_score": 70,
+      "so_score": 78
+    },
+    "events": [
+      { "date": "2026-08-08", "title": "Government Influence Concerns", "description": "New GLC directive raised questions about board independence from political appointees." },
+      { "date": "2026-07-15", "title": "Tariff Review Controversy", "description": "Regulatory tariff decision perceived as politically motivated; board silence criticized." },
+      { "date": "2026-06-22", "title": "Whistleblower Policy Gap", "description": "MSWG noted whistleblower protection framework lacks independent reporting channel." },
+      { "date": "2026-05-30", "title": "Sustainability Governance", "description": "Appointed Chief Sustainability Officer but without direct board reporting line." }
+    ],
+    "interventions": [
+      { "priority": "high", "title": "Strengthen Board Independence", "explanation": "Increase non-government-linked independent directors to supermajority to mitigate GLC perception.", "impact": "+2.8 pts", "construct": "BL" },
+      { "priority": "medium", "title": "Establish Independent Whistleblower Channel", "explanation": "Implement third-party whistleblower hotline with direct audit committee oversight.", "impact": "+1.8 pts", "construct": "EI" },
+      { "priority": "medium", "title": "Elevate CSO Reporting", "explanation": "Grant CSO direct board access and quarterly sustainability committee presentations.", "impact": "+1.2 pts", "construct": "SO" }
+    ]
+  },
+  {
+    "code": "5225",
+    "name": "IHH Healthcare",
+    "sector": "Healthcare",
+    "score": 80,
+    "trend": -2.1,
+    "riskLevel": "low",
+    "constructs": {
+      "bl_score": 84,
+      "sv_score": 82,
+      "ei_score": 78,
+      "rm_score": 76,
+      "rt_score": 82,
+      "se_score": 80,
+      "so_score": 78
+    },
+    "events": [
+      { "date": "2026-08-01", "title": "Cross-Border Governance Complexity", "description": "Operations in 10 countries create varying compliance standards. Board addressing harmonization." },
+      { "date": "2026-07-10", "title": "Related-Party Review", "description": "Mandated independent review of all inter-company transactions above RM 10M threshold." },
+      { "date": "2026-06-18", "title": "Board Committee Restructure", "description": "Created dedicated Risk Committee separate from Audit Committee." },
+      { "date": "2026-05-25", "title": "Investor Day Feedback", "description": "Institutional investors praised governance improvements but flagged cross-border risk oversight." }
+    ],
+    "interventions": [
+      { "priority": "medium", "title": "Harmonize Global Governance Standards", "explanation": "Develop unified governance framework across all 10 operating countries with local compliance layers.", "impact": "+1.5 pts", "construct": "RM" },
+      { "priority": "low", "title": "Enhance Related-Party Transparency", "explanation": "Publish quarterly related-party transaction summaries rather than annual disclosures only.", "impact": "+0.9 pts", "construct": "EI" },
+      { "priority": "low", "title": "Expand Risk Committee Scope", "explanation": "Include cybersecurity and data privacy governance in the new Risk Committee's mandate.", "impact": "+0.7 pts", "construct": "RM" }
+    ]
+  },
+  {
+    "code": "5183",
+    "name": "Petronas Chemicals",
+    "sector": "Energy",
+    "score": 71,
+    "trend": -6.3,
+    "riskLevel": "medium",
+    "constructs": {
+      "bl_score": 58,
+      "sv_score": 74,
+      "ei_score": 72,
+      "rm_score": 70,
+      "rt_score": 68,
+      "se_score": 75,
+      "so_score": 80
+    },
+    "events": [
+      { "date": "2026-08-09", "title": "Parent Company Influence", "description": "Petronas parent tightened capital allocation control, raising minority shareholder concerns." },
+      { "date": "2026-07-20", "title": "Board Composition Concerns", "description": "4 of 9 directors have direct Petronas parent company ties." },
+      { "date": "2026-06-30", "title": "Dividend Policy Ambiguity", "description": "No clear dividend commitment despite strong cash flows. Investors suspect parent extraction." },
+      { "date": "2026-06-01", "title": "Climate Transition Planning", "description": "Announced net-zero target but governance framework for climate oversight remains vague." }
+    ],
+    "interventions": [
+      { "priority": "high", "title": "Independent Director Supermajority", "explanation": "Appoint 2 additional independent directors to reduce perception of parent-company dominance.", "impact": "+2.5 pts", "construct": "BL" },
+      { "priority": "high", "title": "Formalize Dividend Policy", "explanation": "Commit to transparent dividend payout ratio to address minority shareholder confidence.", "impact": "+2.2 pts", "construct": "SE" },
+      { "priority": "medium", "title": "Climate Governance Committee", "explanation": "Establish dedicated board committee for climate transition with clear KPIs and accountability.", "impact": "+1.6 pts", "construct": "SO" }
+    ]
+  },
+  {
+    "code": "3182",
+    "name": "Genting Berhad",
+    "sector": "Leisure & Tourism",
+    "score": 58,
+    "trend": -11.2,
+    "riskLevel": "high",
+    "constructs": {
+      "bl_score": 45,
+      "sv_score": 62,
+      "ei_score": 48,
+      "rm_score": 58,
+      "rt_score": 65,
+      "se_score": 55,
+      "so_score": 72
+    },
+    "events": [
+      { "date": "2026-08-14", "title": "Family Concentration Risk", "description": "Founding family controls 44% of votes. Institutional investors demanding governance reforms." },
+      { "date": "2026-07-28", "title": "Complex Group Structure", "description": "Cross-holdings between 4 listed entities create opaque related-party relationships." },
+      { "date": "2026-07-01", "title": "RPT Controversy", "description": "RM 2.3B related-party transaction approved without independent shareholder vote." },
+      { "date": "2026-06-05", "title": "Board Effectiveness Review Absent", "description": "No external board evaluation conducted in 3 years despite MCCG recommendation." }
+    ],
+    "interventions": [
+      { "priority": "high", "title": "Independent Shareholder Vote for Major RPTs", "explanation": "Voluntarily adopt independent shareholder approval for all RPTs above RM 500M.", "impact": "+4.1 pts", "construct": "EI" },
+      { "priority": "high", "title": "Commission External Board Review", "explanation": "Engage independent firm for board effectiveness assessment and publish findings.", "impact": "+3.2 pts", "construct": "BL" },
+      { "priority": "high", "title": "Simplify Group Structure", "explanation": "Announce roadmap to reduce cross-holdings and improve structural transparency over 24 months.", "impact": "+2.8 pts", "construct": "RM" }
+    ]
+  },
+  {
+    "code": "6888",
+    "name": "Axiata Group",
+    "sector": "Telecommunications",
+    "score": 69,
+    "trend": -7.1,
+    "riskLevel": "high",
+    "constructs": {
+      "bl_score": 72,
+      "sv_score": 68,
+      "ei_score": 65,
+      "rm_score": 60,
+      "rt_score": 55,
+      "se_score": 72,
+      "so_score": 91
+    },
+    "events": [
+      { "date": "2026-08-11", "title": "Merger Governance Concerns", "description": "Proposed regional merger raises questions about minority shareholder protection." },
+      { "date": "2026-07-25", "title": "Executive Compensation Spike", "description": "CEO pay increased 45% despite flat share price. Proxy advisors issued adverse recommendation." },
+      { "date": "2026-07-02", "title": "Foreign Subsidiary Oversight", "description": "Compliance failures in South Asian subsidiary highlighted board oversight gaps." },
+      { "date": "2026-06-12", "title": "Investor Engagement Decline", "description": "Participation in investor briefings dropped 30% YoY. Analyst coverage reduced." }
+    ],
+    "interventions": [
+      { "priority": "high", "title": "Align CEO Pay to Performance", "explanation": "Restructure compensation with 60% tied to TSR and operational KPIs. Publish peer comparison.", "impact": "+3.0 pts", "construct": "RT" },
+      { "priority": "high", "title": "Merger Governance Framework", "explanation": "Establish independent committee with minority shareholder representative for merger oversight.", "impact": "+2.6 pts", "construct": "RM" },
+      { "priority": "medium", "title": "Subsidiary Governance Overhaul", "explanation": "Deploy group-wide compliance monitoring with quarterly board reporting on foreign operations.", "impact": "+1.8 pts", "construct": "EI" }
+    ]
+  },
+  {
+    "code": "4707",
+    "name": "Nestle Malaysia",
+    "sector": "Consumer Products",
+    "score": 88,
+    "trend": 1.2,
+    "riskLevel": "low",
+    "constructs": {
+      "bl_score": 90,
+      "sv_score": 88,
+      "ei_score": 92,
+      "rm_score": 85,
+      "rt_score": 86,
+      "se_score": 90,
+      "so_score": 85
+    },
+    "events": [
+      { "date": "2026-08-06", "title": "Governance Excellence Award", "description": "Received MSWG-ASEAN Corporate Governance Award for 3rd consecutive year." },
+      { "date": "2026-07-12", "title": "Board Diversity Achievement", "description": "Achieved 40% women on board, exceeding MCCG target." },
+      { "date": "2026-06-20", "title": "Enhanced Sustainability Reporting", "description": "First Malaysian company to adopt ISSB S1 and S2 standards ahead of mandate." },
+      { "date": "2026-05-15", "title": "Shareholder Rights Enhancement", "description": "Adopted poll voting for all resolutions and real-time AGM result disclosure." }
+    ],
+    "interventions": [
+      { "priority": "low", "title": "Maintain Governance Leadership", "explanation": "Continue setting benchmarks by early-adopting upcoming MCCG 2026 recommendations.", "impact": "+0.8 pts", "construct": "BL" },
+      { "priority": "low", "title": "Expand Stakeholder Engagement", "explanation": "Pioneer structured engagement with employee representatives at board level.", "impact": "+0.6 pts", "construct": "SE" },
+      { "priority": "low", "title": "Digital Governance Innovation", "explanation": "Implement blockchain-based shareholder voting pilot for next AGM.", "impact": "+0.5 pts", "construct": "SE" }
+    ]
+  },
+  {
+    "code": "5681",
+    "name": "Petronas Dagangan",
+    "sector": "Energy",
+    "score": 73,
+    "trend": -3.8,
+    "riskLevel": "medium",
+    "constructs": {
+      "bl_score": 68,
+      "sv_score": 72,
+      "ei_score": 75,
+      "rm_score": 70,
+      "rt_score": 76,
+      "se_score": 74,
+      "so_score": 76
+    },
+    "events": [
+      { "date": "2026-08-03", "title": "Board Composition Update", "description": "Added 2 new independent directors with digital transformation expertise." },
+      { "date": "2026-07-14", "title": "Parent Dependency Concern", "description": "90% revenue from Petronas parent creates structural governance dependency." },
+      { "date": "2026-06-25", "title": "RPT Framework Review", "description": "Audit committee initiated comprehensive related-party transaction framework review." },
+      { "date": "2026-05-28", "title": "Investor Relations Upgrade", "description": "Launched dedicated IR microsite with enhanced governance disclosures." }
+    ],
+    "interventions": [
+      { "priority": "medium", "title": "Revenue Diversification Governance", "explanation": "Board to oversee strategic plan reducing parent revenue dependency below 80% by 2028.", "impact": "+1.8 pts", "construct": "SV" },
+      { "priority": "medium", "title": "Enhanced RPT Disclosure", "explanation": "Publish quarterly RPT dashboard with pricing methodology and arm's-length confirmations.", "impact": "+1.5 pts", "construct": "EI" },
+      { "priority": "low", "title": "Accelerate Digital Governance", "explanation": "Leverage new directors' expertise to establish technology governance sub-committee.", "impact": "+1.0 pts", "construct": "RM" }
+    ]
+  },
+  {
+    "code": "5285",
+    "name": "Sime Darby Plantation",
+    "sector": "Plantation",
+    "score": 62,
+    "trend": -9.5,
+    "riskLevel": "high",
+    "constructs": {
+      "bl_score": 55,
+      "sv_score": 65,
+      "ei_score": 48,
+      "rm_score": 60,
+      "rt_score": 72,
+      "se_score": 58,
+      "so_score": 76
+    },
+    "events": [
+      { "date": "2026-08-13", "title": "Forced Labour Allegations Resurface", "description": "NGO report alleges ongoing labor rights issues. Board response deemed inadequate by ESG investors." },
+      { "date": "2026-07-26", "title": "US Import Ban Extension", "description": "CBP extended WRO affecting key product lines. Board oversight of supply chain questioned." },
+      { "date": "2026-07-08", "title": "Independent Director Resignation", "description": "Lead independent director resigned citing insufficient board commitment to reform." },
+      { "date": "2026-06-15", "title": "AGM Protest Vote", "description": "28% vote against re-election of board chairman. Highest dissent in company history." }
+    ],
+    "interventions": [
+      { "priority": "high", "title": "Appoint Human Rights Board Champion", "explanation": "Designate senior independent director as board-level human rights oversight lead.", "impact": "+3.8 pts", "construct": "EI" },
+      { "priority": "high", "title": "Independent Supply Chain Audit", "explanation": "Commission and publish independent third-party labor practices audit within 90 days.", "impact": "+3.2 pts", "construct": "SO" },
+      { "priority": "high", "title": "Board Leadership Renewal", "explanation": "Address protest vote by initiating chairman succession process with clear timeline.", "impact": "+2.5 pts", "construct": "BL" }
+    ]
+  },
+  {
+    "code": "4863",
+    "name": "Telekom Malaysia",
+    "sector": "Telecommunications",
+    "score": 76,
+    "trend": -2.8,
+    "riskLevel": "low",
+    "constructs": {
+      "bl_score": 78,
+      "sv_score": 80,
+      "ei_score": 76,
+      "rm_score": 72,
+      "rt_score": 74,
+      "se_score": 78,
+      "so_score": 74
+    },
+    "events": [
+      { "date": "2026-08-07", "title": "Digital Transformation Governance", "description": "Board approved new technology governance framework with quarterly progress reviews." },
+      { "date": "2026-07-16", "title": "Cybersecurity Board Briefing", "description": "First dedicated cybersecurity session at board level. External expert presentation." },
+      { "date": "2026-06-28", "title": "Regulatory Compliance Enhancement", "description": "Proactively adopted enhanced MCMC compliance framework ahead of mandate." },
+      { "date": "2026-05-22", "title": "Stakeholder Engagement Review", "description": "Annual materiality assessment identified data privacy as top stakeholder concern." }
+    ],
+    "interventions": [
+      { "priority": "medium", "title": "Permanent Cyber Governance Role", "explanation": "Convert ad-hoc cyber briefings into standing board agenda item with dedicated CISO reporting line.", "impact": "+1.6 pts", "construct": "RM" },
+      { "priority": "medium", "title": "Data Privacy Governance Framework", "explanation": "Establish board-level data privacy oversight committee responding to stakeholder materiality concerns.", "impact": "+1.4 pts", "construct": "SE" },
+      { "priority": "low", "title": "Technology Advisory Panel", "explanation": "Create external technology advisory panel with quarterly board presentations on emerging risks.", "impact": "+0.9 pts", "construct": "SV" }
+    ]
+  }
+]
