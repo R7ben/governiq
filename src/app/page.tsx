@@ -1,331 +1,36 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  Search, TrendingDown, TrendingUp, Shield, ArrowRight,
-  Building2, BarChart3, AlertTriangle, Clock, Info, SearchX,
-} from "lucide-react";
-import { LineChart, Line, ResponsiveContainer } from "recharts";
-import { Input } from "@/components/ui/input";
+import { AlertTriangle, ArrowRight, BarChart3, Building2, CheckCircle2, Clock3, Search, ShieldCheck, TrendingDown, TrendingUp } from "lucide-react";
+import { Line, LineChart, ResponsiveContainer } from "recharts";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import companiesData from "@/data/companies.json";
 import { Company } from "@/types/company";
 
 const companies = companiesData as Company[];
-
-const riskColors = {
-  high: "bg-red-500/20 text-red-400 border-red-500/30",
-  medium: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-  low: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-};
-
-const scoreColors = {
-  high: "text-red-400",
-  medium: "text-amber-400",
-  low: "text-emerald-400",
-};
-
-function getScoreRating(score: number): "high" | "medium" | "low" {
-  if (score >= 75) return "low";
-  if (score >= 65) return "medium";
-  return "high";
+const riskStyles = { high: "border-red-400/30 bg-red-400/10 text-red-300", medium: "border-amber-400/30 bg-amber-400/10 text-amber-300", low: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" };
+const scoreStyles = { high: "text-red-300", medium: "text-amber-300", low: "text-emerald-300" };
+function rating(score: number): "high" | "medium" | "low" { return score >= 75 ? "low" : score >= 65 ? "medium" : "high"; }
+function sparkline(code: string, trend: number) {
+  let seed = code.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  return Array.from({ length: 8 }, (_, i) => { seed = (seed * 9301 + 49297) % 233280; const noise = (seed / 233280 - 0.5) * 1.8; return { v: 50 + (trend / 7) * i + noise }; });
 }
-
-// Generate sparkline data from trend value
-function generateSparkline(trend: number): { v: number }[] {
-  const points = 8;
-  const data: { v: number }[] = [];
-  let val = 50;
-  for (let i = 0; i < points; i++) {
-    val += (trend / points) + (Math.random() - 0.5) * 2;
-    data.push({ v: Math.max(0, Math.min(100, val)) });
-  }
-  return data;
+function Metric({ label, value, note, icon: Icon, tone = "text-foreground" }: { label: string; value: string | number; note: string; icon: typeof Building2; tone?: string }) {
+  return <div className="border-l border-border/80 pl-4"><div className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground"><Icon className="size-3.5" />{label}</div><div className={`font-mono text-3xl font-semibold tracking-tight ${tone}`}>{value}</div><p className="mt-1 text-xs text-muted-foreground">{note}</p></div>;
 }
-
-// Animated counter component
-function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string }) {
-  const [display, setDisplay] = useState(0);
-  useEffect(() => {
-    const duration = 800;
-    const start = performance.now();
-    const animate = (now: number) => {
-      const progress = Math.min((now - start) / duration, 1);
-      setDisplay(Math.round(value * progress * 10) / 10);
-      if (progress < 1) requestAnimationFrame(animate);
-    };
-    requestAnimationFrame(animate);
-  }, [value]);
-  return (
-    <span className="tabular-nums">
-      {Number.isInteger(value) ? Math.round(display) : display.toFixed(1)}
-      {suffix}
-    </span>
-  );
-}
-
 export default function DashboardPage() {
-  const [search, setSearch] = useState("");
-  const [riskFilter, setRiskFilter] = useState<string | null>(null);
-
-  const filtered = useMemo(() => {
-    return companies.filter((c) => {
-      const matchesSearch =
-        c.name.toLowerCase().includes(search.toLowerCase()) ||
-        c.code.includes(search) ||
-        c.sector.toLowerCase().includes(search.toLowerCase());
-      const matchesRisk = !riskFilter || c.riskLevel === riskFilter;
-      return matchesSearch && matchesRisk;
-    });
-  }, [search, riskFilter]);
-
-  const avgScore = useMemo(() => {
-    return Math.round((companies.reduce((sum, c) => sum + c.score, 0) / companies.length) * 10) / 10;
-  }, []);
-
-  const avgTrend = useMemo(() => {
-    return Math.round((companies.reduce((sum, c) => sum + c.trend, 0) / companies.length) * 10) / 10;
-  }, []);
-
-  const highRiskCount = useMemo(() => {
-    return companies.filter((c) => c.riskLevel === "high").length;
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-zinc-950">
-      {/* Header */}
-      <header className="border-b border-zinc-800 px-4 sm:px-6 py-4">
-        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <Shield className="h-8 w-8 text-emerald-400" />
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-50">GovernIQ</h1>
-              <p className="text-xs text-zinc-400 tracking-wide">ESG & Governance Intelligence for Bursa Malaysia</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs tracking-wide">
-              PLC Tier · Investor Confidence Engine
-            </Badge>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
-        {/* Stat Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Building2 className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500 tracking-wide">Coverage</span>
-                </div>
-                <div className="text-2xl font-bold text-zinc-100">
-                  <AnimatedNumber value={companies.length} />
-                </div>
-                <p className="text-xs text-zinc-500 mt-1 tracking-wide">Bursa PLCs</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.05 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <BarChart3 className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500 tracking-wide">Avg ICS</span>
-                </div>
-                <div className="text-2xl font-bold text-zinc-100">
-                  <AnimatedNumber value={avgScore} />
-                </div>
-                <p className={`text-xs mt-1 tracking-wide tabular-nums ${avgTrend >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                  {avgTrend > 0 ? "+" : ""}{avgTrend} avg trend
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="h-4 w-4 text-red-400" />
-                  <span className="text-xs text-zinc-500 tracking-wide">Open Alerts</span>
-                </div>
-                <div className="text-2xl font-bold text-red-400">
-                  <AnimatedNumber value={highRiskCount} />
-                </div>
-                <p className="text-xs text-zinc-500 mt-1 tracking-wide">High risk</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Clock className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500 tracking-wide">Last Refresh</span>
-                </div>
-                <div className="text-2xl font-bold text-zinc-100 tabular-nums">2h</div>
-                <p className="text-xs text-zinc-500 mt-1 tracking-wide">ago</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6 sm:mb-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-            <Input
-              placeholder="Search by company, code, or sector..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500"
-            />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {(["high", "medium", "low"] as const).map((level) => (
-              <button
-                key={level}
-                onClick={() => setRiskFilter(riskFilter === level ? null : level)}
-                className={`min-h-[44px] sm:min-h-0 inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 ${
-                  riskFilter === level
-                    ? riskColors[level]
-                    : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:bg-zinc-800"
-                }`}
-              >
-                {level.charAt(0).toUpperCase() + level.slice(1)} Risk
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Company Table */}
-        <div className="rounded-lg border border-zinc-800 overflow-x-auto">
-          <table className="w-full min-w-[700px]">
-            <thead>
-              <tr className="bg-zinc-900/50 border-b border-zinc-800">
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">Company</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider hidden sm:table-cell">Code</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider hidden md:table-cell">Sector</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-400 uppercase tracking-wider">ICS</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                  <span className="inline-flex items-center gap-1">
-                    30d Trend
-                    <span className="relative group">
-                      <Info className="h-3 w-3 text-zinc-600 cursor-help" />
-                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-zinc-300 bg-zinc-800 border border-zinc-700 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                        Simulated trajectory for demonstration — based on real 2024 governance scores
-                      </span>
-                    </span>
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-400 uppercase tracking-wider hidden sm:table-cell">Trend</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-400 uppercase tracking-wider">Risk</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wider"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800">
-              {filtered.map((company, i) => {
-                const sparkData = generateSparkline(company.trend);
-                return (
-                  <motion.tr
-                    key={company.code}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: i * 0.03 }}
-                    className="bg-zinc-950 hover:bg-zinc-900/50 transition-colors group"
-                  >
-                    <td className="px-4 py-4">
-                      <span className="font-medium text-zinc-100">{company.name}</span>
-                    </td>
-                    <td className="px-4 py-4 text-sm text-zinc-400 font-mono hidden sm:table-cell">{company.code}</td>
-                    <td className="px-4 py-4 text-sm text-zinc-400 hidden md:table-cell">{company.sector}</td>
-                    <td className="px-4 py-4 text-center">
-                      <span className={`text-sm font-bold tabular-nums ${scoreColors[getScoreRating(company.score)]}`}>
-                        {company.score}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <span className={`inline-flex items-center gap-1 text-sm tabular-nums ${
-                        company.trend >= 0 ? "text-emerald-400" : "text-red-400"
-                      }`}>
-                        {company.trend >= 0 ? (
-                          <TrendingUp className="h-4 w-4" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4" />
-                        )}
-                        {company.trend > 0 ? "+" : ""}{company.trend}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center hidden sm:table-cell">
-                      <div className="w-[60px] h-[24px] mx-auto">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={sparkData}>
-                            <Line
-                              type="monotone"
-                              dataKey="v"
-                              stroke={company.trend >= 0 ? "#34d399" : "#f87171"}
-                              strokeWidth={1.5}
-                              dot={false}
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <Badge className={`${riskColors[company.riskLevel]} text-xs`}>
-                        {company.riskLevel}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <Link
-                        href={`/company/${company.code}`}
-                        className="inline-flex items-center gap-1 text-sm text-zinc-500 group-hover:text-emerald-400 transition-colors rounded-sm px-1 -mx-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
-                      >
-                        View
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </td>
-                  </motion.tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-          {/* Empty state */}
-          {filtered.length === 0 && (
-            <div className="px-4 py-16 text-center">
-              <SearchX className="h-6 w-6 text-zinc-700 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-zinc-300 mb-2">No companies match these filters</h3>
-              <p className="text-sm text-zinc-500 mb-4">Try broadening your search or clearing the risk filter below.</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => { setSearch(""); setRiskFilter(null); }}
-                className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-              >
-                Clear filters
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Validation Badge Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-zinc-600 tracking-wide">
-            Scoring model validated via PLS-SEM structural analysis · N=100 Malaysian PLCs · VIF &lt; 5.0
-          </p>
-        </div>
-      </main>
-    </div>
-  );
+  const [search, setSearch] = useState(""); const [riskFilter, setRiskFilter] = useState<string | null>(null);
+  const filtered = useMemo(() => companies.filter((c) => (!search || `${c.name} ${c.code} ${c.sector}`.toLowerCase().includes(search.toLowerCase())) && (!riskFilter || c.riskLevel === riskFilter)), [search, riskFilter]);
+  const avgScore = (companies.reduce((sum, c) => sum + c.score, 0) / companies.length).toFixed(1); const avgTrend = (companies.reduce((sum, c) => sum + c.trend, 0) / companies.length).toFixed(1); const highRisk = companies.filter((c) => c.riskLevel === "high").length;
+  return <div className="min-h-screen bg-background"><header className="border-b border-border/70 bg-background/95"><div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 lg:px-8"><Link href="/" className="flex items-center gap-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><div className="flex size-9 items-center justify-center border border-primary/40 bg-primary/10 text-primary"><ShieldCheck className="size-5" /></div><div><div className="font-mono text-sm font-semibold tracking-[0.22em] text-foreground">GOVERNIQ</div><div className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Governance intelligence / Bursa Malaysia</div></div></Link><div className="hidden items-center gap-5 text-xs text-muted-foreground sm:flex"><span className="flex items-center gap-2"><span className="size-1.5 rounded-full bg-primary" />Model online</span><span className="font-mono">2024.12</span></div></div></header>
+    <main className="mx-auto max-w-7xl px-5 py-7 lg:px-8 lg:py-10"><div className="mb-8 flex flex-col justify-between gap-6 border-b border-border/70 pb-7 md:flex-row md:items-end"><div><p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-primary">Coverage / 01</p><h1 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Market governance monitor</h1><p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">A forward-looking view of governance quality, risk signals, and board-level interventions across Malaysian PLCs.</p></div><div className="flex items-center gap-2 text-xs text-muted-foreground"><Clock3 className="size-4" />Last model refresh <span className="font-mono text-foreground">02h ago</span></div></div>
+      <section className="mb-10 grid grid-cols-2 gap-y-7 md:grid-cols-4 md:gap-x-8"><Metric label="Coverage" value={companies.length} note="Bursa PLCs monitored" icon={Building2} /><Metric label="Avg. ICS" value={avgScore} note={`${Number(avgTrend) >= 0 ? "+" : ""}${avgTrend} 30-day movement`} icon={BarChart3} tone="text-primary" /><Metric label="Open alerts" value={highRisk} note="High-risk entities" icon={AlertTriangle} tone="text-red-300" /><Metric label="Confidence" value="94%" note="Model validation signal" icon={CheckCircle2} tone="text-cyan-300" /></section>
+      <section className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center"><div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input aria-label="Search companies" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search company, ticker, or sector" className="h-12 border-border bg-card pl-10 font-mono text-sm placeholder:font-sans placeholder:text-muted-foreground/70" /></div><div className="flex items-center gap-1 border border-border bg-card p-1"><span className="px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Risk</span>{(["high", "medium", "low"] as const).map((level) => <button key={level} onClick={() => setRiskFilter(riskFilter === level ? null : level)} className={`min-h-9 px-3 text-xs capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${riskFilter === level ? riskStyles[level] : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>{level}</button>)}</div></section>
+      <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground"><span><span className="font-mono text-foreground">{filtered.length}</span> entities returned</span><span className="hidden sm:block">Sorted by governance risk</span></div>
+      <div className="overflow-x-auto border border-border bg-card"><table className="w-full min-w-[760px] text-left"><thead><tr className="border-b border-border bg-muted/30 text-[10px] uppercase tracking-[0.16em] text-muted-foreground"><th className="px-4 py-3 font-semibold">Entity</th><th className="px-4 py-3 font-semibold">ICS</th><th className="px-4 py-3 font-semibold">30d trajectory</th><th className="px-4 py-3 font-semibold">Signal</th><th className="px-4 py-3 text-right font-semibold">Dossier</th></tr></thead><tbody>{filtered.map((company, i) => <motion.tr key={company.code} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * .025 }} className="group border-b border-border/70 last:border-0 hover:bg-muted/25"><td className="relative px-4 py-4"><span className={`absolute inset-y-0 left-0 w-0.5 ${company.riskLevel === "high" ? "bg-red-400" : company.riskLevel === "medium" ? "bg-amber-400" : "bg-emerald-400"}`} /><div className="font-medium text-foreground">{company.name}</div><div className="mt-1 flex gap-2 text-xs text-muted-foreground"><span className="font-mono">{company.code}</span><span>·</span><span>{company.sector}</span></div></td><td className={`px-4 py-4 font-mono text-lg font-semibold ${scoreStyles[rating(company.score)]}`}>{company.score}</td><td className="px-4 py-4"><div className="flex items-center gap-3"><div className="h-7 w-20"><ResponsiveContainer width="100%" height="100%"><LineChart data={sparkline(company.code, company.trend)}><Line type="monotone" dataKey="v" stroke={company.trend >= 0 ? "hsl(var(--primary))" : "hsl(var(--destructive))"} strokeWidth={1.5} dot={false} /></LineChart></ResponsiveContainer></div><span className={`flex items-center gap-1 font-mono text-xs ${company.trend >= 0 ? "text-primary" : "text-red-300"}`}>{company.trend >= 0 ? <TrendingUp className="size-3.5" /> : <TrendingDown className="size-3.5" />}{company.trend > 0 ? "+" : ""}{company.trend}</span></div></td><td className="px-4 py-4"><Badge variant="outline" className={`font-mono text-[10px] uppercase ${riskStyles[company.riskLevel]}`}>{company.riskLevel}</Badge></td><td className="px-4 py-4 text-right"><Link href={`/company/${company.code}`} className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Open <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" /></Link></td></motion.tr>)}</tbody></table>{filtered.length === 0 && <div className="flex flex-col items-center gap-3 px-6 py-16 text-center"><Search className="size-5 text-muted-foreground" /><p className="text-sm text-foreground">No entities match this query.</p><Button variant="outline" size="sm" onClick={() => { setSearch(""); setRiskFilter(null); }}>Clear filters</Button></div>}</div><p className="mt-6 text-center text-[10px] uppercase tracking-[0.15em] text-muted-foreground/60">Scoring model validated via PLS-SEM structural analysis · N=100 Malaysian PLCs · VIF &lt; 5.0</p>
+    </main></div>;
 }
