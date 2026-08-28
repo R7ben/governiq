@@ -1,331 +1,43 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import {
-  Search, TrendingDown, TrendingUp, Shield, ArrowRight,
-  Building2, BarChart3, AlertTriangle, Clock, Info, SearchX,
-} from "lucide-react";
-import { LineChart, Line, ResponsiveContainer } from "recharts";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, BarChart3, BookOpen, ClipboardCheck, Search, ShieldCheck, Sparkles } from "lucide-react";
 import companiesData from "@/data/companies.json";
-import { Company } from "@/types/company";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { BENCHMARK_AVERAGES, CONSTRUCT_LABELS, CONSTRUCT_KEYS, type Company, type MaturityStatus } from "@/types/company";
+import { overallScore, rankedGaps, scoreToStatus, weakestConstruct } from "@/lib/scoring";
 
 const companies = companiesData as Company[];
-
-const riskColors = {
-  high: "bg-red-500/20 text-red-400 border-red-500/30",
-  medium: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-  low: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-};
-
-const scoreColors = {
-  high: "text-red-400",
-  medium: "text-amber-400",
-  low: "text-emerald-400",
-};
-
-function getScoreRating(score: number): "high" | "medium" | "low" {
-  if (score >= 75) return "low";
-  if (score >= 65) return "medium";
-  return "high";
-}
-
-// Generate sparkline data from trend value
-function generateSparkline(trend: number): { v: number }[] {
-  const points = 8;
-  const data: { v: number }[] = [];
-  let val = 50;
-  for (let i = 0; i < points; i++) {
-    val += (trend / points) + (Math.random() - 0.5) * 2;
-    data.push({ v: Math.max(0, Math.min(100, val)) });
-  }
-  return data;
-}
-
-// Animated counter component
-function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string }) {
-  const [display, setDisplay] = useState(0);
-  useEffect(() => {
-    const duration = 800;
-    const start = performance.now();
-    const animate = (now: number) => {
-      const progress = Math.min((now - start) / duration, 1);
-      setDisplay(Math.round(value * progress * 10) / 10);
-      if (progress < 1) requestAnimationFrame(animate);
-    };
-    requestAnimationFrame(animate);
-  }, [value]);
-  return (
-    <span className="tabular-nums">
-      {Number.isInteger(value) ? Math.round(display) : display.toFixed(1)}
-      {suffix}
-    </span>
-  );
-}
+const statusStyle: Record<MaturityStatus, string> = { Critical: "border-red-500/30 bg-red-500/10 text-red-300", Watch: "border-amber-500/30 bg-amber-500/10 text-amber-300", Strong: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" };
 
 export default function DashboardPage() {
-  const [search, setSearch] = useState("");
-  const [riskFilter, setRiskFilter] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState<MaturityStatus | "All">("All");
+  const [sector, setSector] = useState("All");
+  const avg = Math.round(companies.reduce((sum, c) => sum + c.score, 0) / companies.length);
+  const sectors = Array.from(new Set(companies.map((c) => c.sector))).sort();
+  const marketGaps = rankedGaps({ bl_score: 60, sv_score: 60, ei_score: 63, rm_score: 59, rt_score: 48, se_score: 61, so_score: 57 });
+  const filtered = useMemo(() => companies.filter((c) => {
+    const matchQuery = `${c.name} ${c.code} ${c.sector}`.toLowerCase().includes(query.toLowerCase());
+    return matchQuery && (status === "All" || scoreToStatus(c.score) === status) && (sector === "All" || c.sector === sector);
+  }), [query, status, sector]);
 
-  const filtered = useMemo(() => {
-    return companies.filter((c) => {
-      const matchesSearch =
-        c.name.toLowerCase().includes(search.toLowerCase()) ||
-        c.code.includes(search) ||
-        c.sector.toLowerCase().includes(search.toLowerCase());
-      const matchesRisk = !riskFilter || c.riskLevel === riskFilter;
-      return matchesSearch && matchesRisk;
-    });
-  }, [search, riskFilter]);
-
-  const avgScore = useMemo(() => {
-    return Math.round((companies.reduce((sum, c) => sum + c.score, 0) / companies.length) * 10) / 10;
-  }, []);
-
-  const avgTrend = useMemo(() => {
-    return Math.round((companies.reduce((sum, c) => sum + c.trend, 0) / companies.length) * 10) / 10;
-  }, []);
-
-  const highRiskCount = useMemo(() => {
-    return companies.filter((c) => c.riskLevel === "high").length;
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-zinc-950">
-      {/* Header */}
-      <header className="border-b border-zinc-800 px-4 sm:px-6 py-4">
-        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <Shield className="h-8 w-8 text-emerald-400" />
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-50">GovernIQ</h1>
-              <p className="text-xs text-zinc-400 tracking-wide">ESG & Governance Intelligence for Bursa Malaysia</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs tracking-wide">
-              PLC Tier · Investor Confidence Engine
-            </Badge>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
-        {/* Stat Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Building2 className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500 tracking-wide">Coverage</span>
-                </div>
-                <div className="text-2xl font-bold text-zinc-100">
-                  <AnimatedNumber value={companies.length} />
-                </div>
-                <p className="text-xs text-zinc-500 mt-1 tracking-wide">Bursa PLCs</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.05 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <BarChart3 className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500 tracking-wide">Avg ICS</span>
-                </div>
-                <div className="text-2xl font-bold text-zinc-100">
-                  <AnimatedNumber value={avgScore} />
-                </div>
-                <p className={`text-xs mt-1 tracking-wide tabular-nums ${avgTrend >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                  {avgTrend > 0 ? "+" : ""}{avgTrend} avg trend
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="h-4 w-4 text-red-400" />
-                  <span className="text-xs text-zinc-500 tracking-wide">Open Alerts</span>
-                </div>
-                <div className="text-2xl font-bold text-red-400">
-                  <AnimatedNumber value={highRiskCount} />
-                </div>
-                <p className="text-xs text-zinc-500 mt-1 tracking-wide">High risk</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}>
-            <Card className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Clock className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs text-zinc-500 tracking-wide">Last Refresh</span>
-                </div>
-                <div className="text-2xl font-bold text-zinc-100 tabular-nums">2h</div>
-                <p className="text-xs text-zinc-500 mt-1 tracking-wide">ago</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6 sm:mb-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-            <Input
-              placeholder="Search by company, code, or sector..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500"
-            />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {(["high", "medium", "low"] as const).map((level) => (
-              <button
-                key={level}
-                onClick={() => setRiskFilter(riskFilter === level ? null : level)}
-                className={`min-h-[44px] sm:min-h-0 inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 ${
-                  riskFilter === level
-                    ? riskColors[level]
-                    : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:bg-zinc-800"
-                }`}
-              >
-                {level.charAt(0).toUpperCase() + level.slice(1)} Risk
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Company Table */}
-        <div className="rounded-lg border border-zinc-800 overflow-x-auto">
-          <table className="w-full min-w-[700px]">
-            <thead>
-              <tr className="bg-zinc-900/50 border-b border-zinc-800">
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">Company</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider hidden sm:table-cell">Code</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider hidden md:table-cell">Sector</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-400 uppercase tracking-wider">ICS</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                  <span className="inline-flex items-center gap-1">
-                    30d Trend
-                    <span className="relative group">
-                      <Info className="h-3 w-3 text-zinc-600 cursor-help" />
-                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-zinc-300 bg-zinc-800 border border-zinc-700 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                        Simulated trajectory for demonstration — based on real 2024 governance scores
-                      </span>
-                    </span>
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-400 uppercase tracking-wider hidden sm:table-cell">Trend</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-400 uppercase tracking-wider">Risk</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wider"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800">
-              {filtered.map((company, i) => {
-                const sparkData = generateSparkline(company.trend);
-                return (
-                  <motion.tr
-                    key={company.code}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: i * 0.03 }}
-                    className="bg-zinc-950 hover:bg-zinc-900/50 transition-colors group"
-                  >
-                    <td className="px-4 py-4">
-                      <span className="font-medium text-zinc-100">{company.name}</span>
-                    </td>
-                    <td className="px-4 py-4 text-sm text-zinc-400 font-mono hidden sm:table-cell">{company.code}</td>
-                    <td className="px-4 py-4 text-sm text-zinc-400 hidden md:table-cell">{company.sector}</td>
-                    <td className="px-4 py-4 text-center">
-                      <span className={`text-sm font-bold tabular-nums ${scoreColors[getScoreRating(company.score)]}`}>
-                        {company.score}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <span className={`inline-flex items-center gap-1 text-sm tabular-nums ${
-                        company.trend >= 0 ? "text-emerald-400" : "text-red-400"
-                      }`}>
-                        {company.trend >= 0 ? (
-                          <TrendingUp className="h-4 w-4" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4" />
-                        )}
-                        {company.trend > 0 ? "+" : ""}{company.trend}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center hidden sm:table-cell">
-                      <div className="w-[60px] h-[24px] mx-auto">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={sparkData}>
-                            <Line
-                              type="monotone"
-                              dataKey="v"
-                              stroke={company.trend >= 0 ? "#34d399" : "#f87171"}
-                              strokeWidth={1.5}
-                              dot={false}
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <Badge className={`${riskColors[company.riskLevel]} text-xs`}>
-                        {company.riskLevel}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <Link
-                        href={`/company/${company.code}`}
-                        className="inline-flex items-center gap-1 text-sm text-zinc-500 group-hover:text-emerald-400 transition-colors rounded-sm px-1 -mx-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
-                      >
-                        View
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </td>
-                  </motion.tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-          {/* Empty state */}
-          {filtered.length === 0 && (
-            <div className="px-4 py-16 text-center">
-              <SearchX className="h-6 w-6 text-zinc-700 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-zinc-300 mb-2">No companies match these filters</h3>
-              <p className="text-sm text-zinc-500 mb-4">Try broadening your search or clearing the risk filter below.</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => { setSearch(""); setRiskFilter(null); }}
-                className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-              >
-                Clear filters
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Validation Badge Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-zinc-600 tracking-wide">
-            Scoring model validated via PLS-SEM structural analysis · N=100 Malaysian PLCs · VIF &lt; 5.0
-          </p>
-        </div>
-      </main>
-    </div>
-  );
+  return <div className="min-h-screen bg-zinc-950 text-zinc-100">
+    <header className="border-b border-zinc-800/80 bg-zinc-950/90 sticky top-0 z-20 backdrop-blur"><div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <Link href="/" className="flex items-center gap-3"><ShieldCheck className="h-8 w-8 text-emerald-400" /><span><span className="block text-xl font-semibold tracking-tight">GovernIQ</span><span className="block text-[11px] uppercase tracking-[0.2em] text-zinc-500">Governance intelligence</span></span></Link>
+      <nav className="flex flex-wrap items-center gap-2 text-sm"><a className="rounded-md px-3 py-2 text-zinc-300 hover:bg-zinc-900 hover:text-white" href="#universe">Company explorer</a><Link className="rounded-md px-3 py-2 text-zinc-300 hover:bg-zinc-900 hover:text-white" href="/readiness">Readiness review</Link><Link className="rounded-md px-3 py-2 text-zinc-300 hover:bg-zinc-900 hover:text-white" href="/methodology">How it works</Link></nav>
+    </div></header>
+    <main className="mx-auto max-w-7xl px-4 sm:px-6 py-10 sm:py-14">
+      <section className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] items-end"><div><Badge className="mb-5 border-emerald-500/20 bg-emerald-500/10 text-emerald-300">DEMO BENCHMARK · ILLUSTRATIVE DATA</Badge><h1 className="max-w-3xl text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">Make governance signals easier to act on.</h1><p className="mt-5 max-w-2xl text-lg leading-relaxed text-zinc-400">GovernIQ helps Malaysian organisations benchmark governance, sustainability, and ESG readiness, identify maturity gaps, and choose credible next actions.</p><div className="mt-7 flex flex-wrap gap-3"><a href="#universe"><Button className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400">Explore company universe <ArrowRight className="ml-2 h-4 w-4" /></Button></a><Link href="/readiness"><Button variant="outline" className="border-zinc-700 text-zinc-200 hover:bg-zinc-900"><ClipboardCheck className="mr-2 h-4 w-4" />Assess readiness</Button></Link><Link href="/methodology" className="inline-flex items-center gap-2 rounded-md px-3 text-sm text-zinc-400 hover:text-white"><BookOpen className="h-4 w-4" />Read the method</Link></div></div><Card className="border-emerald-500/20 bg-emerald-500/[0.06]"><CardContent className="p-5"><div className="flex items-center gap-2 text-emerald-300 text-sm font-medium"><Sparkles className="h-4 w-4" /> Decision-support lens</div><p className="mt-4 text-sm leading-relaxed text-zinc-300">Signals are designed to support board, advisory, and management conversations. They are not investment recommendations, compliance certification, or legal advice.</p></CardContent></Card></section>
+      <section className="mt-10"><div className="mb-4"><p className="text-xs uppercase tracking-wider text-emerald-400">Start here</p><h2 className="mt-1 text-2xl font-semibold">Three simple ways GovernIQ helps</h2><p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-500">You do not need a large governance team to use this. Start with the question you want to answer, then follow the guided next step.</p></div><div className="grid gap-3 md:grid-cols-3"><Card className="border-zinc-800 bg-zinc-900/40"><CardContent className="p-5"><div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-400/10 text-emerald-400"><BarChart3 className="h-5 w-5" /></div><h3 className="mt-4 font-semibold">Understand your position</h3><p className="mt-2 text-sm leading-relaxed text-zinc-500">See a simple score across seven governance areas. This gives owners and managers a shared starting point instead of a long report.</p><a href="#universe" className="mt-4 inline-flex items-center text-sm text-emerald-400 hover:text-emerald-300">Explore examples <ArrowRight className="ml-2 h-4 w-4" /></a></CardContent></Card><Card className="border-zinc-800 bg-zinc-900/40"><CardContent className="p-5"><div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-400/10 text-amber-300"><Search className="h-5 w-5" /></div><h3 className="mt-4 font-semibold">Find what to improve</h3><p className="mt-2 text-sm leading-relaxed text-zinc-500">Ranked signals show where attention may be most useful, such as board roles, risk controls, or sustainability practices.</p><Link href="/methodology" className="mt-4 inline-flex items-center text-sm text-emerald-400 hover:text-emerald-300">See the scoring method <ArrowRight className="ml-2 h-4 w-4" /></Link></CardContent></Card><Card className="border-zinc-800 bg-zinc-900/40"><CardContent className="p-5"><div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-400/10 text-indigo-300"><ClipboardCheck className="h-5 w-5" /></div><h3 className="mt-4 font-semibold">Make a practical plan</h3><p className="mt-2 text-sm leading-relaxed text-zinc-500">Answer 20 plain-language questions and get a private session readout with strengths, gaps, and suggested 90-day actions.</p><Link href="/readiness" className="mt-4 inline-flex items-center text-sm text-emerald-400 hover:text-emerald-300">Start readiness review <ArrowRight className="ml-2 h-4 w-4" /></Link></CardContent></Card></div></section>
+      <section className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-5">{[["Coverage", `${companies.length}`, "demo organisations"], ["Indicators", "35", "across seven constructs"], ["Constructs", "7", "governance dimensions"], ["Weakest market area", "RT", "remuneration transparency"], ["Data quality", "Illustrative", "replace with validated source"]].map(([label, value, sub]) => <Card key={label} className="border-zinc-800 bg-zinc-900/40"><CardContent className="p-4"><p className="text-xs uppercase tracking-wider text-zinc-500">{label}</p><p className="mt-3 text-xl font-semibold text-zinc-100">{value}</p><p className="mt-1 text-xs text-zinc-500">{sub}</p></CardContent></Card>)}</section>
+      <section className="mt-12 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]"><Card className="border-zinc-800 bg-zinc-900/40"><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-xs uppercase tracking-wider text-zinc-500">Ranked signals</p><h2 className="mt-1 text-xl font-semibold">Where attention is most useful</h2></div><BarChart3 className="h-5 w-5 text-emerald-400" /></div><div className="mt-6 space-y-4">{marketGaps.slice(0, 5).map((gap, index) => <div key={gap.key}><div className="flex items-center justify-between text-sm"><span><span className="mr-2 text-zinc-600">0{index + 1}</span>{gap.label}</span><span className="tabular-nums text-amber-300">{gap.gap}pt gap</span></div><div className="mt-2 h-2 rounded-full bg-zinc-800"><div className="h-2 rounded-full bg-gradient-to-r from-amber-500 to-emerald-400" style={{ width: `${Math.max(10, gap.gap * 3)}%` }} /></div></div>)}</div></CardContent></Card><Card className="border-zinc-800 bg-zinc-900/40"><CardContent className="p-6"><p className="text-xs uppercase tracking-wider text-zinc-500">Seven-construct pulse</p><h2 className="mt-1 text-xl font-semibold">Maturity against an illustrative benchmark</h2><div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">{CONSTRUCT_KEYS.map((key) => { const score = BENCHMARK_AVERAGES[key]; return <div key={key} className="rounded-lg border border-zinc-800 bg-zinc-950 p-3"><div className="flex justify-between text-xs text-zinc-500"><span>{key.slice(0, 2).toUpperCase()}</span><span>{Math.round(score / 20)}/5</span></div><div className="mt-4 h-20 flex items-end gap-1">{[1,2,3,4,5].map((n) => <div key={n} className={`flex-1 rounded-sm ${n <= Math.round(score / 20) ? "bg-emerald-400" : "bg-zinc-800"}`} style={{ height: `${n * 16}%` }} />)}</div><p className="mt-3 text-xs text-zinc-300">{CONSTRUCT_LABELS[key]}</p></div> })}</div></CardContent></Card></section>
+      <section id="universe" className="mt-14 scroll-mt-24"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs uppercase tracking-wider text-emerald-400">Company universe</p><h2 className="mt-1 text-2xl font-semibold">Explore illustrative signals</h2><p className="mt-2 text-sm text-zinc-500">All records below are demo data pending a validated dataset connection.</p></div><div className="text-right text-sm text-zinc-500">Average demo score <span className="text-zinc-200 font-semibold">{avg}/100</span></div></div><div className="mt-6 flex flex-col gap-3 md:flex-row"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" /><Input aria-label="Search company universe" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search company, code, or sector" className="pl-10 bg-zinc-900 border-zinc-800" /></div><select aria-label="Filter by sector" value={sector} onChange={(e) => setSector(e.target.value)} className="rounded-md border border-zinc-800 bg-zinc-900 px-3 text-sm text-zinc-300"><option>All</option>{sectors.map((s) => <option key={s}>{s}</option>)}</select><select aria-label="Filter by maturity status" value={status} onChange={(e) => setStatus(e.target.value as MaturityStatus | "All")} className="rounded-md border border-zinc-800 bg-zinc-900 px-3 text-sm text-zinc-300"><option>All</option><option>Critical</option><option>Watch</option><option>Strong</option></select></div><div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">{filtered.map((company) => { const score = overallScore(company.constructs); const rating = scoreToStatus(score); const weak = weakestConstruct(company.constructs); return <Card key={company.code} className="border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"><CardContent className="p-5"><div className="flex items-start justify-between gap-3"><div><p className="font-medium text-zinc-100">{company.name}</p><p className="mt-1 text-xs text-zinc-500">{company.code} · {company.sector}</p></div><Badge className={statusStyle[rating]}>{rating}</Badge></div><div className="mt-6 flex items-end justify-between"><div><p className="text-3xl font-semibold tabular-nums">{score}<span className="text-sm text-zinc-500">/100</span></p><p className="mt-1 text-xs text-zinc-500">Weakest: {weak.label}</p></div><Link href={`/company/${company.code}`} className="inline-flex items-center gap-1 text-sm text-emerald-400 hover:text-emerald-300">Profile <ArrowRight className="h-4 w-4" /></Link></div></CardContent></Card>})}</div>{filtered.length === 0 && <div className="rounded-lg border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">No demo organisations match these filters.</div>}</section>
+      <p className="mt-10 border-t border-zinc-900 pt-5 text-xs leading-relaxed text-zinc-600">GovernIQ is a decision-support prototype. Demo data is illustrative and not a live benchmark. Outputs are not investment advice, compliance certification, or legal advice.</p>
+    </main>
+  </div>;
 }
