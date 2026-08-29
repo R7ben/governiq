@@ -1,4 +1,4 @@
-import { BENCHMARK_AVERAGES, CONSTRUCT_LABELS, CONSTRUCT_KEYS, type ConstructScores, type MaturityStatus } from "@/types/company";
+import { BENCHMARK_AVERAGES, CONSTRUCT_CODES, CONSTRUCT_KEYS, CONSTRUCT_LABELS, Company, ConstructScores, MaturityStatus } from "@/types/company";
 
 export function maturityFromResponse(value: number): number {
   return Math.max(1, Math.min(5, Math.round(value)));
@@ -32,6 +32,20 @@ export function rankedGaps(scores: ConstructScores) {
     benchmark: BENCHMARK_AVERAGES[key],
     gap: Math.max(0, BENCHMARK_AVERAGES[key] - scores[key]),
   })).sort((a, b) => b.gap - a.gap);
+}
+
+export function rankedMarketGaps(companies: Pick<Company, "constructs">[]) {
+  return CONSTRUCT_KEYS.map((key) => {
+    const marketAverage = companies.length ? companies.reduce((sum, company) => sum + company.constructs[key], 0) / companies.length : 0;
+    return {
+      key,
+      code: CONSTRUCT_CODES[key],
+      label: CONSTRUCT_LABELS[key],
+      score: Math.round(marketAverage * 10) / 10,
+      benchmark: BENCHMARK_AVERAGES[key],
+      gap: Math.round((marketAverage - BENCHMARK_AVERAGES[key]) * 10) / 10,
+    };
+  }).sort((a, b) => a.gap - b.gap);
 }
 
 export function constructScoresFromResponses(responses: Record<string, number>, statements: { id: string; construct: string }[]) {
