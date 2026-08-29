@@ -97,9 +97,47 @@
   .glass-card:hover {
     border-color: hsl(158 64% 51% / 0.28) !important;
     box-shadow: 0 16px 42px hsl(240 10% 0% / 0.22), inset 0 1px 0 hsl(0 0% 100% / 0.05);
+    transform: translateY(-2px);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .glass-card { transition: none; }
+    .glass-card:hover { transform: none; }
   }
+}
+
+@layer components {
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: hsl(240 10% 16% / 0.72);
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.08), transparent);
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+  .motion-lift {
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  }
+  .motion-lift:hover { transform: translateY(-2px); }
+  button:not(:disabled), a {
+    transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+  }
+  button:not(:disabled):active { transform: scale(0.98); }
+  @keyframes skeleton-shimmer { 100% { transform: translateX(100%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton::after { animation: none; }
+    .motion-lift { transition: none; }
+    .motion-lift:hover { transform: none; }
+    button:not(:disabled), a { transition: none; }
+    button:not(:disabled):active { transform: none; }
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
 }
