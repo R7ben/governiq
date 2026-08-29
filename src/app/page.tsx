@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BENCHMARK_AVERAGES, CONSTRUCT_LABELS, CONSTRUCT_KEYS, type Company, type MaturityStatus } from "@/types/company";
 import { overallScore, rankedMarketGaps, scoreToStatus, weakestConstruct } from "@/lib/scoring";
+import { AppSidebar } from "@/components/app-sidebar";
 
 const companies = companiesData as Company[];
 const statusStyle: Record<MaturityStatus, string> = { Critical: "border-red-500/30 bg-red-500/10 text-red-300", Watch: "border-amber-500/30 bg-amber-500/10 text-amber-300", Strong: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" };
@@ -30,7 +31,8 @@ export default function DashboardPage() {
     return matchQuery && (status === "All" || scoreToStatus(c.score) === status) && (sector === "All" || c.sector === sector);
   }), [query, status, sector]);
 
-  return <div className="app-shell min-h-screen bg-zinc-950 text-zinc-100">
+  return <div className="app-shell min-h-screen bg-zinc-950 text-zinc-100 md:pl-[72px]">
+    <AppSidebar />
     <header className="sticky top-0 z-20 border-b border-white/10 bg-zinc-950/55 backdrop-blur-xl"><div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
       <Link href="/" className="flex items-center gap-3"><ShieldCheck className="h-8 w-8 text-emerald-400" /><span><span className="block text-xl font-semibold tracking-tight">GovernIQ</span><span className="block text-[11px] uppercase tracking-[0.2em] text-zinc-500">Governance intelligence</span></span></Link>
       <nav className="flex flex-wrap items-center gap-2 text-sm"><a className="rounded-md px-3 py-2 text-zinc-300 hover:bg-zinc-900 hover:text-white" href="#universe">Company explorer</a><Link className="rounded-md px-3 py-2 text-zinc-300 hover:bg-zinc-900 hover:text-white" href="/readiness">Readiness review</Link><Link className="rounded-md px-3 py-2 text-zinc-300 hover:bg-zinc-900 hover:text-white" href="/methodology">How it works</Link></nav>

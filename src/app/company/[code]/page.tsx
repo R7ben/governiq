@@ -12,6 +12,7 @@ import { weakestConstruct } from "@/lib/scoring";
 import { AiAdvisorTab } from "@/components/ai-advisor-tab";
 import { InterventionsTab } from "@/components/interventions-tab";
 import { ScoreBreakdown } from "@/components/score-breakdown";
+import { AppSidebar } from "@/components/app-sidebar";
 
 const companies = companiesData as Company[];
 
@@ -27,8 +28,7 @@ export default function CompanyDetailPage() {
   const company = companies.find((c) => c.code === code);
 
   if (!company) {
-    return (
-      <div className="app-shell min-h-screen bg-zinc-950 flex items-center justify-center">
+    return (<div className="app-shell min-h-screen bg-zinc-950 text-zinc-100 md:pl-[72px] flex items-center justify-center"><AppSidebar />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-zinc-100 mb-2">Company Not Found</h1>
           <p className="text-zinc-400 mb-4">
@@ -46,7 +46,7 @@ export default function CompanyDetailPage() {
   }
 
   return (
-    <div className="app-shell min-h-screen bg-zinc-950">
+    <div className="app-shell min-h-screen bg-zinc-950 md:pl-[72px]"><AppSidebar />
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-zinc-950/55 px-4 sm:px-6 py-4 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
