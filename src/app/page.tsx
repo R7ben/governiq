@@ -33,7 +33,7 @@ export default function DashboardPage() {
     return matchQuery && (status === "All" || scoreToStatus(c.score) === status) && (sector === "All" || c.sector === sector);
   }), [query, status, sector]);
 
-  return <div className="app-shell min-h-screen bg-zinc-950 text-zinc-100 md:pl-[72px]">
+  return <div className="app-shell min-h-screen bg-zinc-950 text-zinc-100">
     <MouseGlow />
     <AppSidebar />
     <header className="sticky top-0 z-20 border-b border-white/10 bg-zinc-950/55 backdrop-blur-xl"><div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
