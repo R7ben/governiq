@@ -128,28 +128,8 @@ export default function CompanyDetailPage() {
               <Calendar className="h-5 w-5 text-zinc-400" />
               Evidence Timeline
             </h3>
-            <div className="relative pl-6 border-l border-zinc-800">
-              {company.events.map((event, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.15 + i * 0.08 }}
-                  className="mb-6 relative"
-                >
-                  <div className="absolute -left-[31px] top-1 w-3 h-3 rounded-full bg-zinc-800 border-2 border-zinc-600" />
-                  <p className="text-xs text-zinc-500 mb-1 tracking-wide tabular-nums">
-                    {new Date(event.date).toLocaleDateString("en-MY", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </p>
-                  <h4 className="text-sm font-medium text-zinc-200 mb-1">{event.title}</h4>
-                  <p className="text-sm text-zinc-400 leading-relaxed">{event.description}</p>
-                </motion.div>
-              ))}
-            </div>
+            <p className="mb-4 max-w-xl text-sm leading-relaxed text-zinc-400">Each bar represents a dated governance event. Hover over a bar, or focus it with the keyboard, to read the evidence behind the company’s current signal.</p>
+            <div className="glass-card rounded-2xl p-5"><div className="relative flex h-56 items-end gap-3 border-b border-white/10 px-2 pb-0">{company.events.map((event, i) => { const date = new Date(event.date); const height = 38 + ((company.events.length - i) * 13); const label = date.toLocaleDateString("en-MY", { day: "numeric", month: "short" }); return <div key={i} className="group relative flex h-full flex-1 items-end justify-center" tabIndex={0} aria-label={`${event.title}, ${label}`}><div className="absolute bottom-0 h-full w-px bg-white/5" /><div className="relative z-10 w-full max-w-12 cursor-help rounded-t-lg bg-gradient-to-t from-emerald-500/50 to-emerald-300/90 outline-none transition-all duration-300 group-hover:from-amber-400/70 group-hover:to-amber-300 group-hover:shadow-[0_0_24px_rgba(52,211,153,0.25)] group-focus-visible:ring-2 group-focus-visible:ring-emerald-300" style={{ height: `${height}%` }}><span className="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] text-zinc-500">{label}</span><div className="pointer-events-none absolute bottom-[calc(100%+0.75rem)] left-1/2 z-20 w-64 -translate-x-1/2 rounded-xl border border-white/15 bg-zinc-950/95 p-3 text-left opacity-0 shadow-2xl backdrop-blur-xl transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"><p className="text-xs font-semibold text-emerald-300">{event.title}</p><p className="mt-1 text-[11px] text-zinc-500">{date.toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" })}</p><p className="mt-2 text-xs leading-relaxed text-zinc-300">{event.description}</p></div></div></div>; })}</div><div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">{company.events.map((event) => <p key={event.date} className="truncate text-[11px] text-zinc-500" title={event.title}>{event.title}</p>)}</div></div>
           </motion.div>
 
           {/* Right: AI Panel with Tabs */}

@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useRef, useState } from "react";
-import { useCompletion } from "@ai-sdk/react";
 import { motion } from "framer-motion";
 import { CheckCircle2, HelpCircle, Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,7 +33,7 @@ export function AiAdvisorTab({ company }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fallbackNotice, setFallbackNotice] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { complete } = useCompletion({ api: "/api/advisor", streamProtocol: "text" });
+  const submissionLock = useRef(false);
   const busy = isSubmitting;
   const canAsk = question.trim().length > 0 && !busy;
 
@@ -46,7 +45,8 @@ export function AiAdvisorTab({ company }: Props) {
 
   const askAdvisor = async (value: string) => {
     const trimmed = value.trim();
-    if (!trimmed || busy) return;
+    if (!trimmed || busy || submissionLock.current) return;
+    submissionLock.current = true;
 
     setQuestion(trimmed);
     setAskedQuestion(trimmed);
@@ -55,33 +55,10 @@ export function AiAdvisorTab({ company }: Props) {
     setErrorMessage("");
     setIsSubmitting(true);
 
-    try {
-      const remoteAnswer = await complete(trimmed, {
-        body: {
-          question: trimmed,
-          companyName: company.name,
-          code: company.code,
-          sector: company.sector,
-          score: company.score,
-          trend: company.trend,
-          constructs: company.constructs,
-          events: company.events,
-          interventions: company.interventions,
-        },
-      });
-
-      if (remoteAnswer?.trim()) {
-        setAnswer(remoteAnswer);
-      } else {
-        setAnswer(formatAdvisorAnswer(generateFallbackAdvisor(trimmed, company)));
-        setFallbackNotice("Live Advisor is unavailable, so local guidance is shown instead.");
-      }
-    } catch {
-      setAnswer(formatAdvisorAnswer(generateFallbackAdvisor(trimmed, company)));
-      setFallbackNotice("Live Advisor is unavailable, so local guidance is shown instead.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    const localAnswer = formatAdvisorAnswer(generateFallbackAdvisor(trimmed, company));
+    setAnswer(localAnswer);
+    setFallbackNotice("Instant local guidance based on this company profile.");
+    queueMicrotask(() => { submissionLock.current = false; setIsSubmitting(false); });
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
