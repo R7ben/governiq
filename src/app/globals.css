@@ -62,7 +62,24 @@
   .app-shell {
     position: relative;
     isolation: isolate;
-    background: hsl(240 10% 3.9%);
+    overflow: hidden;
+    background: radial-gradient(38rem circle at var(--pointer-x, 50%) var(--pointer-y, 18%), hsl(158 72% 45% / 0.22), transparent 66%), hsl(150 18% 3.5%);
+  }
+
+  .app-shell > :not(.mouse-glow) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .mouse-glow {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(34rem circle at var(--pointer-x, 50%) var(--pointer-y, 20%), hsl(158 72% 45% / 0.2), transparent 68%);
+    filter: blur(10px);
+    opacity: 0.95;
+    transition: background 120ms ease-out;
   }
 
   .app-shell::before {
@@ -71,7 +88,7 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background-image: linear-gradient(hsl(0 0% 100% / 0.025) 1px, transparent 1px), linear-gradient(90deg, hsl(0 0% 100% / 0.025) 1px, transparent 1px);
+    background-image: linear-gradient(hsl(158 60% 70% / 0.035) 1px, transparent 1px), linear-gradient(90deg, hsl(158 60% 70% / 0.035) 1px, transparent 1px);
     background-size: 64px 64px;
     mask-image: linear-gradient(to bottom, black, transparent 65%);
   }
@@ -102,6 +119,7 @@
   @media (prefers-reduced-motion: reduce) {
     .glass-card { transition: none; }
     .glass-card:hover { transform: none; }
+    .mouse-glow { display: none; }
   }
 }
 
