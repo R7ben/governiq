@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, HelpCircle, Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,10 @@ const FAQS = [
   ["How should I ask a good question?", "Ask one specific question at a time, such as which construct to investigate first or what evidence would validate a concern."],
 ];
 
+const REQUEST_TIMEOUT_MS = 15000;
+
+type AiState = "idle" | "streaming" | "ready" | "unavailable";
+
 export function AiAdvisorTab({ company }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [question, setQuestion] = useState("");
@@ -33,9 +37,13 @@ export function AiAdvisorTab({ company }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fallbackNotice, setFallbackNotice] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [aiState, setAiState] = useState<AiState>("idle");
   const submissionLock = useRef(false);
+  const abortRef = useRef<AbortController | null>(null);
   const busy = isSubmitting;
   const canAsk = question.trim().length > 0 && !busy;
+
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   const selectQuickQuestion = (value: string) => {
     setQuestion(value);
@@ -43,22 +51,79 @@ export function AiAdvisorTab({ company }: Props) {
     inputRef.current?.focus();
   };
 
+  const streamLiveAnswer = async (trimmed: string, controller: AbortController) => {
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch("/api/advisor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          question: trimmed,
+          companyName: company.name,
+          code: company.code,
+          sector: company.sector,
+          score: company.score,
+          trend: company.trend,
+          constructs: company.constructs,
+          events: company.events,
+          interventions: company.interventions,
+        }),
+      });
+      if (!response.ok || !response.body) throw new Error("advisor unavailable");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let text = "";
+      let started = false;
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+        if (!started) {
+          started = true;
+          text = "";
+          setAiState("streaming");
+          setFallbackNotice("");
+        }
+        text += chunk;
+        setAnswer(text);
+      }
+      if (controller.signal.aborted) return;
+      if (!text.trim()) throw new Error("empty advisor response");
+      setAiState("ready");
+    } catch {
+      if (controller.signal.aborted) return;
+      setAiState("unavailable");
+      setFallbackNotice("Instant local guidance based on this company profile.");
+    } finally {
+      clearTimeout(timeout);
+    }
+  };
+
   const askAdvisor = async (value: string) => {
     const trimmed = value.trim();
     if (!trimmed || busy || submissionLock.current) return;
     submissionLock.current = true;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     setQuestion(trimmed);
     setAskedQuestion(trimmed);
     setAnswer("");
     setFallbackNotice("");
     setErrorMessage("");
+    setAiState("idle");
     setIsSubmitting(true);
 
     const localAnswer = formatAdvisorAnswer(generateFallbackAdvisor(trimmed, company));
     setAnswer(localAnswer);
     setFallbackNotice("Instant local guidance based on this company profile.");
     queueMicrotask(() => { submissionLock.current = false; setIsSubmitting(false); });
+
+    void streamLiveAnswer(trimmed, controller);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -66,14 +131,15 @@ export function AiAdvisorTab({ company }: Props) {
     void askAdvisor(question);
   };
 
-  const liveMessage = busy ? "Advisor is preparing a response." : errorMessage ? errorMessage : fallbackNotice ? fallbackNotice : answer ? "Advisor response ready." : "";
+  const statusLabel = aiState === "streaming" ? "Live AI · responding" : aiState === "ready" ? "Live AI response" : "Fast guidance";
+  const liveMessage = busy ? "Advisor is preparing a response." : aiState === "streaming" ? "Advisor is streaming a live response." : errorMessage ? errorMessage : fallbackNotice ? fallbackNotice : answer ? "Advisor response ready." : "";
 
   return (
     <div className="glass-panel rounded-2xl p-5 sm:p-6">
       <div className="flex items-start gap-3 mb-5">
         <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-2.5"><Sparkles className="h-5 w-5 text-emerald-400" /></div>
         <div>
-          <div className="flex items-center gap-2"><h4 className="text-base font-semibold text-zinc-100">AI Advisor</h4><span className="text-[10px] uppercase tracking-wider text-emerald-400">Fast guidance</span></div>
+          <div className="flex items-center gap-2"><h4 className="text-base font-semibold text-zinc-100">AI Advisor</h4><span className="text-[10px] uppercase tracking-wider text-emerald-400">{statusLabel}</span></div>
           <p className="mt-1 text-sm text-zinc-400">Ask one focused question and get concise, evidence-aware guidance for {company.name}.</p>
         </div>
       </div>
@@ -98,10 +164,12 @@ export function AiAdvisorTab({ company }: Props) {
         <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="glass-card mt-5 rounded-xl p-4" aria-live="polite">
           {askedQuestion && <p className="mb-3 text-xs font-medium text-emerald-400">{askedQuestion}</p>}
           {busy && !answer && <p className="text-sm text-zinc-400">Reviewing the available company signals…</p>}
+          {aiState === "streaming" && <p className="mb-2 flex items-center gap-1.5 text-[11px] text-emerald-300"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />Streaming a live AI response…</p>}
           {answer && <MarkdownContent content={answer} />}
           {fallbackNotice && <p className="mt-3 text-xs text-amber-300">{fallbackNotice}</p>}
+          {aiState === "ready" && <p className="mt-3 text-xs text-emerald-300">Live AI response grounded in this company’s current signals.</p>}
           {errorMessage && <p className="mt-3 text-sm text-red-400">{errorMessage}</p>}
-          {!busy && answer && <CheckCircle2 className="mt-3 h-4 w-4 text-emerald-400" aria-label="Advisor response complete" />}
+          {!busy && aiState !== "streaming" && answer && <CheckCircle2 className="mt-3 h-4 w-4 text-emerald-400" aria-label="Advisor response complete" />}
         </motion.div>
       )}
 

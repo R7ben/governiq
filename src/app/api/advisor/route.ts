@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       return Response.json({ error: "Please provide a focused question and valid company context." }, { status: 400 });
     }
 
-    const constructContext = constructs ? Object.entries({
+    const CONSTRUCT_LABELS: Record<string, string> = {
       bl_score: "Board Leadership",
       sv_score: "Strategic Vision",
       ei_score: "Ethical Integrity",
@@ -39,14 +39,17 @@ export async function POST(req: Request) {
       rt_score: "Remuneration Transparency",
       se_score: "Stakeholder Engagement",
       so_score: "Sustainability Orientation",
-    }).map(([key, label]) => `${label}: ${score(constructs[key]) ?? 0}/100`).join("; ") : "Unavailable";
+    };
+    const constructScores = constructs ? Object.entries(CONSTRUCT_LABELS).map(([key, label]) => ({ label, value: score(constructs[key]) ?? 0 })) : [];
+    const constructContext = constructScores.length ? constructScores.map((c) => `${c.label}: ${c.value}/100`).join("; ") : "Unavailable";
+    const weakest = constructScores.length ? [...constructScores].sort((a, b) => a.value - b.value)[0] : null;
 
     const result = streamText({
       model: groq(ADVISOR_MODEL),
-      maxOutputTokens: 160,
+      maxOutputTokens: 220,
       temperature: 0.2,
-      system: "You are GovernIQ Advisor. Answer one governance question at a time. Be direct, practical, and concise (under 120 words). Use the supplied metrics only as illustrative signals, never as certification, legal advice, or investment advice. If evidence is incomplete, say so and ask one useful follow-up question.",
-      prompt: `Question: ${question}\nCompany: ${companyName} (${code}), ${sector || "sector not specified"}. Overall score: ${overallScore}/100. 30-day trend: ${trend} points. Constructs: ${constructContext}\nEvidence timeline: ${events.join(" | ") || "Unavailable"}\nInterventions: ${interventions.join(" | ") || "Unavailable"}`,
+      system: "You are GovernIQ Advisor, a governance intelligence assistant. Answer one governance question at a time using the supplied company signals. Format the entire response as markdown: a single `## ` headline line, then 2-4 concise bullet points (`- `) with the most decision-relevant guidance, then one italicized disclaimer line (`_..._`) noting this is illustrative decision support, not certification, legal, or investment advice. Be direct and practical, under 130 words total. Prioritize the weakest signal when it is relevant to the question. If evidence is incomplete, say so in a bullet and suggest one useful follow-up question.",
+      prompt: `Question: ${question}\nCompany: ${companyName} (${code}), ${sector || "sector not specified"}. Overall score: ${overallScore}/100. 30-day trend: ${trend} points.\nConstructs: ${constructContext}\nWeakest signal: ${weakest ? `${weakest.label} at ${weakest.value}/100` : "Unavailable"}\nEvidence timeline: ${events.join(" | ") || "Unavailable"}\nInterventions: ${interventions.join(" | ") || "Unavailable"}`,
     });
 
     const response = result.toTextStreamResponse();
