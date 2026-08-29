@@ -2,7 +2,7 @@ import { streamText } from "ai";
 import { groq } from "@ai-sdk/groq";
 
 const MAX_TEXT = 180;
-const ADVISOR_MODEL = process.env.GROQ_ADVISOR_MODEL || "llama-3.1-8b-instant";
+const ADVISOR_MODEL = process.env.GROQ_ADVISOR_MODEL || "openai/gpt-oss-20b";
 
 const text = (value: unknown) => typeof value === "string" ? value.trim().slice(0, MAX_TEXT) : "";
 const score = (value: unknown) => typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : null;
@@ -46,8 +46,9 @@ export async function POST(req: Request) {
 
     const result = streamText({
       model: groq(ADVISOR_MODEL),
-      maxOutputTokens: 220,
+      maxOutputTokens: 500,
       temperature: 0.2,
+      providerOptions: { groq: { reasoningEffort: "low", reasoningFormat: "hidden" } },
       system: "You are GovernIQ Advisor, a governance intelligence assistant. Answer one governance question at a time using the supplied company signals. Format the entire response as markdown: a single `## ` headline line, then 2-4 concise bullet points (`- `) with the most decision-relevant guidance, then one italicized disclaimer line (`_..._`) noting this is illustrative decision support, not certification, legal, or investment advice. Be direct and practical, under 130 words total. Prioritize the weakest signal when it is relevant to the question. If evidence is incomplete, say so in a bullet and suggest one useful follow-up question.",
       prompt: `Question: ${question}\nCompany: ${companyName} (${code}), ${sector || "sector not specified"}. Overall score: ${overallScore}/100. 30-day trend: ${trend} points.\nConstructs: ${constructContext}\nWeakest signal: ${weakest ? `${weakest.label} at ${weakest.value}/100` : "Unavailable"}\nEvidence timeline: ${events.join(" | ") || "Unavailable"}\nInterventions: ${interventions.join(" | ") || "Unavailable"}`,
     });
